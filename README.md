@@ -1,2 +1,2 @@
-# mdtodocs
-mdtodocs
+# mypandoc
+mypandoc

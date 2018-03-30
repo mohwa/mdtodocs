@@ -1,0 +1,9 @@
+% chapter, part 텍스트 제거 방법
+% http://www.arj.no/2011/05/04/remove-chapter-and-part-text-from-latex-documents/
+\renewcommand{\partname}{}
+\renewcommand{\chaptername}{}
+\renewcommand{\thechapter}{}
+\renewcommand{\thesection}{}
+\renewcommand\contentsname{목차}
+
+\usepackage{longtable}\setlength{\LTleft}{0em}

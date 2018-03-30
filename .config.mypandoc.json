@@ -1,0 +1,9 @@
+{
+	"latex": {
+		"documentclass": "report",
+		"papersize": "a4",
+		"mainfont": "NanumMyeongjo",
+		"geometry": "left=3cm,right=3cm,top=2cm,bottom=2cm",
+		"linestretch": "1.25"
+	}
+}
