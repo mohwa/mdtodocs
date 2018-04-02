@@ -66,7 +66,7 @@ npm i -g mdtodocs
 ```
 
 |이름|설명|
-|:--:|:--:|:-----:|:----------|
+|:--:|:----------|
 |`src`|변환될  `md`파일 위치를 지정합니다.([glob](https://github.com/isaacs/node-glob) 패턴을 사용할 수 있습니다)
 |`dist`|출력 파일 위치를 지정합니다.
 |`outputTypes`|출력 타입을 지정합니다.(현재 `docx`, `latex(pdf)`만 제공합니다)
