@@ -4,15 +4,6 @@ author: mohwa
 toc-title: 목차
 ---
 
-<h1 align="center">
-	<br>
-	<br>
-	<img width="320" src="https://github.com/chalk/chalk/blob/master/media/logo.png" alt="chalk">
-	<br>
-	<br>
-	<br>
-</h1>
-
 > Terminal string styling done right
 
 ### [See what's new in Chalk 2](https://github.com/chalk/chalk/releases/tag/v2.0.0)

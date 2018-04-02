@@ -31,6 +31,11 @@ npm i -g mdtodocs
 
 파일은 반드시 `cli`실행 경로에 위치해야하며, 변환 시 사용될 `root`경로도 `cli` 실행 위치와 같습니다.
 
+```
+// 설정된 상대 경로는 이와 같이 절대 변경로 변경됩니다.
+"reference-doc": "templates/default.docx" // "root(cli 실행 위치)/templates/default.docx"
+```
+
 > 아래 설정은 `example 프로젝트`를 기준으로 작성된 파일입니다.
 
 ```

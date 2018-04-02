@@ -13,6 +13,10 @@ const { execSync, spawnSync } = require('child_process');
 
 const CONFIG_FILE_NAME = '.mdtodocs.json';
 
+const REFERENCE_DOC = path.join(__dirname, 'templates/default.docx');
+const TEMPLATE_LATEX = path.join(__dirname, 'templates/default.latex');
+const HEADER_LATEX = path.join(__dirname, 'templates/header.latex');
+
 // 파일 또는 디렉토리 경로값을 가진 속성
 const ATTR_WITH_FILE_OR_DIR = {
     "log": true,
@@ -97,6 +101,15 @@ class MdToDocs{
 
                 _.forEach(outputTypes, type => {
 
+                    // reference 및 template 기본 설정
+                    if (type === 'docx'){
+                        defaultOpts['reference-doc'] = REFERENCE_DOC;
+                    }
+                    else if (type === 'latex'){
+                        defaultOpts['template'] = TEMPLATE_LATEX;
+                        defaultOpts['include-in-header'] = HEADER_LATEX;
+                    }
+
                     const convertFileName = _getFileName(type, path.basename(file).replace(/.[a-z]+$/, ''));
 
                     defaultOpts.output = path.join(dist, convertFileName);
@@ -143,12 +156,11 @@ function _getOptions(type = 'docx'){
     const root = this.root;
 
     let opts = config.templates[type].options;
+    let tmpOpts = _.assign({}, defaultOpts, opts);
 
-    opts = _.assign({}, defaultOpts, opts);
+    _.map(tmpOpts, (v, k) => {
 
-    _.map(opts, (v, k) => {
-
-        const isFileValue = ATTR_WITH_FILE_OR_DIR[k];
+        const isFileValue = ATTR_WITH_FILE_OR_DIR[k] && opts[k];
 
         if (_.isBoolean(v) && v){
             ret.push(`--${k}`);

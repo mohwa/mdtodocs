@@ -6,20 +6,13 @@
 	"outputTypes": ["docx", "latex"],
 	"templates": {
 		"docx": {
-			"opts": {
-				"reference-doc": "templates/default.docx"
+			"options": {
 			},
 			"variables": {
-				"pointsize": "14p",
-				"lineheight": "12p",
-				"fontfamily": "T",
-				"indent": "5m"
 			}
 		},
 		"latex": {
-			"opts": {
-				"template": "templates/default.latex",
-				"include-in-header": "templates/header.latex",
+			"options": {
 				"pdf-engine": "xelatex",
 				"webtex": "",
 				"default-image-extension": "svg"
