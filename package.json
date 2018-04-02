@@ -1,7 +1,7 @@
 {
-  "name": "mypandoc",
-  "version": "0.0.0",
-  "description": "mypandoc",
+  "name": "mdtodocs",
+  "version": "0.0.1",
+  "description": "mdtodocs",
   "keywords": [
     "pandoc",
     "docx",
@@ -15,10 +15,10 @@
   "main": "index.js",
   "dependencies": {
     "lodash": "^4.14.1",
-    "js-yaml": "^3.11.0",
     "argparse": "^1.0.10",
     "chalk": "^2.3.2",
-    "fs-extra": "^5.0.0"
+    "fs-extra": "^5.0.0",
+    "glob": "^7.0.3"
   },
   "bin": {
     "mdtodocs": "./bin/cli.js"

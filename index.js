@@ -1,221 +1,205 @@
 
 const fs = require('fs');
 const path = require('path');
+const process = require('process');
 
 const _ = require('lodash');
-const fse = require('fs-extra');
-const yaml = require('js-yaml');
 const chalk = require('chalk');
+const fse = require('fs-extra');
+const glob = require('glob');
 const log = require('./lib/log');
 
 const { execSync, spawnSync } = require('child_process');
 
-// 공용 npm registry url
-//const NPMJS_URL = 'http://registry.npmjs.org';
+const CONFIG_FILE_NAME = '.mdtodocs.json';
+
+// 파일 또는 디렉토리 경로값을 가진 속성
+const ATTR_WITH_FILE_OR_DIR = {
+    "log": true,
+    "abbreviations": true,
+    "template": true,
+    "print-default-data-file": true,
+    "syntax-definition": true,
+    "include-in-header": true,
+    "include-before-body": true,
+    "include-after-body": true,
+    "reference-doc": true,
+    "bibliography": true,
+    "csl": true,
+    "citation-abbreviations": true,
+    "data-dir": true,
+    "extract-media": true,
+    "filter": true
+};
 
 /**
- * MyPandoc 클래스
+ * MdToDocs 클래스
  */
 class MdToDocs{
 
-    constructor({
-        config = '',
-        packages = [],
-        force = false
-    } = {}){
+    constructor(){
 
-        // config.yaml file path
-        this.configPath = config;
-        // 개별 패키지명
-        this.packages = packages;
+        this.root = process.env.PWD;
 
-        // 개별 패키지명 사용 여부
-        this.isPackages = !_.isEmpty(this.packages) ? true : false;
-        // force 설치 여부
-        this.force = force;
-
-        // config.yaml 파일에 정의된 storage path
-        this.storage = '';
-        // npm registry url
-        this.registryUrl = '';
+        this.init();
     }
-    //publish(){
-    //
-    //    const configPath = this.configPath;
-    //
-    //    if (_.isEmpty(configPath)) log.fatal('not found config property.');
-    //    if (!fs.existsSync(configPath)) log.fatal('not exists config file.');
-    //
-    //    let config = yaml.safeLoadAll(fs.readFileSync(configPath, 'utf-8'));
-    //
-    //    if (!_.isArray(config)) log.fatal('not import configFile info.');
-    //
-    //    // config.yaml to json
-    //    config = config[0];
-    //
-    //    this.storage = config.storage;
-    //
-    //    if (
-    //    _.isEmpty(config.uplinks.mynpmpub) ||
-    //    _.isEmpty(config.uplinks.mynpmpub.url)){
-    //        log.fatal('not found `uplinks.mynpmpub.url` property.');
-    //    }
-    //
-    //    this.registryUrl = config.uplinks.mynpmpub.url;
-    //
-    //    if (this.force && _.isEmpty(this.storage)) log.fatal('not found storage property.');
-    //
-    //    // package.json 파일이 존재하는 경로
-    //    const packageRootPath = _.trim(spawnSync('npm', ['root'], {shell: true, encoding: 'utf8'}).stdout);
-    //    const srcPath = path.join(packageRootPath); // path/to/node_modules
-    //    const destPath = path.join(packageRootPath.replace('node_modules', ''), 'node_modules_bak'); // path/to/node_modules_bak
-    //
-    //    // 전체 또는 개별 패키지들을 설치한다.
-    //    _packageInstall.call(this, srcPath, destPath);
-    //
-    //    // 의존성 트리 정보를 가져온다.
-    //    const npmList = JSON.parse(spawnSync('npm', ['ls', '--json'], {shell: true, encoding: 'utf8'}).stdout);
-    //
-    //    if (!_.size(npmList.dependencies)) log.log('Not exists dependencies.');
-    //
-    //    // 사설 서버에 의존성 패키지를 게시한다.
-    //    _publish.call(this, _createDependencyList(npmList.dependencies));
-    //
-    //    // 기존 node_modules 폴더를 복구시킨다.
-    //    if (this.isPackages){
-    //
-    //        log.log('Restore the node_modules folder. ...', 'green');
-    //
-    //        fse.removeSync(srcPath);
-    //        fse.moveSync(destPath, srcPath);
-    //    }
-    //}
+    init(){
+
+        const root = this.root;
+        const configPath = path.resolve(root, CONFIG_FILE_NAME);
+
+        if (!fse.pathExistsSync(configPath)){
+            log.fatal('not found `.mdtodocs.json` config file in root path');
+            return;
+        }
+
+        const config = this.config = JSON.parse(fse.readFileSync(configPath, 'utf-8'));
+        const outputTypes = this.outputTypes = config.outputTypes || [];
+
+        if (!_.isArray(outputTypes) || !_.size(outputTypes)){
+            log.fatal('not found outputTypes property');
+            return;
+        }
+
+        this.src = config.src || [];
+        const dist = this.dist = path.join(root, config.dist) || `${root}/dist`;
+
+        if (!fse.pathExistsSync(dist)) fse.mkdirsSync(dist);
+    }
+    convert(){
+
+        const root = this.root;
+        const src = this.src;
+        const dist = this.dist;
+        const outputTypes = this.outputTypes;
+
+        const defaultOpts = this.defaultOpts = {
+            from: "markdown",
+            toc: true,
+            "toc-depth": "2",
+            "highlight-style": "tango"
+        };
+
+        const to = {
+            docx: 'docx',
+            latex: 'latex'
+        };
+
+        _.forEach(src, v => {
+
+            const files = glob.sync(path.join(root, v));
+
+            // entry list 출력해주기
+            log.log('Entry files...', 'green');
+            log.log(files.join('\n'), 'whiteBright');
+
+            _.forEach(files, file => {
+
+                _.forEach(outputTypes, type => {
+
+                    const convertFileName = _getFileName(type, path.basename(file).replace(/.[a-z]+$/, ''));
+
+                    defaultOpts.output = path.join(dist, convertFileName);
+                    defaultOpts.to = to[type];
+
+                    _exec.call(this, type, file);
+                });
+            });
+        });
+    }
 }
 
+/**
+ *
+ * @param type
+ * @param file - md file path
+ * @private
+ */
+function _exec(type = 'docx', file = ''){
 
-///**
-// *
-// * 현재 디렉토리에 있는 의존성 NPM 패키지들을 모두 가져온다.
-// *
-// * @param dependencies
-// * @param _dependencies
-// * @returns {{}}
-// * @private
-// */
-//function _createDependencyList(dependencies = {}, _dependencies = {}){
-//
-//    _dependencies = _dependencies || {};
-//
-//    _.map(dependencies, (v, k) => {
-//
-//        if (v.dependencies){
-//            _createDependencyList(v.dependencies, _dependencies);
-//        }
-//
-//        const version = v.version;
-//
-//        if (version){
-//
-//            let _dependencie = _.isArray(_dependencies[k]) ? _dependencies[k] : [];
-//
-//            if (_dependencie.indexOf(version) === -1){
-//                _dependencie.push(version);
-//            }
-//
-//            _dependencies[k] = _dependencie;
-//        }
-//    });
-//
-//    return _dependencies;
-//}
-//
-///**
-// * 공용 NPM 서버에서 가져온 tarball 파일을 사설 NPM 서버에 게시한다.
-// *
-// * @param dependencies
-// * @constructor
-// */
-//function _publish(dependencies = {}){
-//
-//    _.map(dependencies, (v, k) => {
-//
-//        // 버전 리스트
-//        let versions = v;
-//        // 패키지명
-//        let _k = k;
-//
-//        const packagePath = path.join(this.storage, k);
-//
-//        // `storage` 디렉토리의 기존 패키지 폴더를 삭제한다(파일 존재 여부에 상관없이, 무조건 재설치 되도록 강제시킨다)
-//        if (fs.existsSync(packagePath) && this.force) fse.removeSync('-rf', packagePath);
-//
-//        _.forEach(versions, v => {
-//
-//            let resolved = `${NPMJS_URL}/${k}/-/${k}-${v}.tgz`;
-//
-//            // @scope 패키지일 경우
-//            if (_isScopePackage(k)) _k = k.split('/')[1];
-//
-//            const tarballPath = path.join(packagePath, `${_k}-${v}.tgz`);
-//
-//            // tarball 파일이 존재할 경우...
-//            if (fs.existsSync(tarballPath)){
-//                log.log(`Cannot publish over existing version. - ${k}(${v})`, 'gray');
-//                return;
-//            }
-//
-//            const command = `npm publish ${resolved} --registry ${this.registryUrl}`;
-//
-//            log.log(command, 'yellow');
-//
-//            execSync(command, {stdio: 'inherit', shell: true});
-//        });
-//    });
-//}
-//
-///**
-// *
-// * (전체 또는 개별) 패키지를 설치한다.
-// *
-// * @param srcPath
-// * @param destPath
-// * @private
-// */
-//function _packageInstall(srcPath = '', destPath = ''){
-//
-//    const args = ['i'];
-//
-//    // 개별 패키지명이 있는 경우
-//    if (this.isPackages){
-//
-//        if (!fs.existsSync(srcPath)){
-//            log.fatal('not exists node_modules path.(run command `npm i`)');
-//        }
-//
-//        log.log('Move the node_modules folder. ...', 'yellow');
-//
-//        fse.moveSync(srcPath, destPath);
-//
-//        args.push(this.packages.join(' '));
-//        args.push('--no-save');
-//    }
-//
-//    args.push(`--registry ${NPMJS_URL}`);
-//
-//    console.log(`command: ${chalk.yellow(`npm ${args.join(' ')}`)}`);
-//
-//    spawnSync('npm', args, {stdio: 'inherit', shell: true});
-//}
-//
-///**
-// * @scope 패키지 여부를 반환한다.
-// *
-// * @param v
-// * @returns {boolean}
-// * @private
-// */
-//function _isScopePackage(v = ''){
-//    return /^\@/.test(v);
-//}
+    const opts = _getOptions.call(this, type);
+    const variables = _setVariables.call(this, type);
+
+    const command = `pandoc ${opts} ${variables} ${file}`;
+
+    log.log('\nRun command...', 'green');
+    log.log(`${command}`, 'yellow');
+
+    spawnSync('pandoc', [opts, variables, file], {stdio: 'inherit', shell: true});
+
+}
+
+/**
+ *
+ * @param type
+ * @private
+ */
+function _getOptions(type = 'docx'){
+
+    const ret = [];
+
+    const defaultOpts = this.defaultOpts;
+    const config = this.config;
+    const root = this.root;
+
+    let opts = config.templates[type].opts;
+
+    opts = _.assign({}, defaultOpts, opts);
+
+    _.map(opts, (v, k) => {
+
+        const isFileValue = ATTR_WITH_FILE_OR_DIR[k];
+
+        if (_.isBoolean(v) && v){
+            ret.push(`--${k}`);
+        }
+        else{
+
+            if (isFileValue) v = path.join(root, v);
+
+            ret.push(`--${k}=${v}`);
+        }
+    });
+
+    return ret.join(' ');
+}
+
+/**
+ *
+ * @returns {string}
+ * @private
+ */
+function _setVariables(type = 'docx'){
+
+    var ret = [];
+
+    const config = this.config;
+    let variables = {};
+
+    if (
+    config.templates &&
+    config.templates[type] &&
+    config.templates[type].variables){
+        variables = config.templates[type].variables;
+    }
+
+    _.map(variables, (v, k) => {
+        ret.push(`--variable ${k}=${v}`);
+    });
+
+    return ret.join(' ');
+}
+
+/**
+ *
+ * @param type
+ * @param fileName
+ * @returns {*}
+ * @private
+ */
+function _getFileName(type = 'docx', fileName =  ''){
+    return type === 'docx' ? `${fileName}.docx` : `${fileName}.pdf`;
+}
+
 
 module.exports = MdToDocs;

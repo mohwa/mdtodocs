@@ -1,0 +1,38 @@
+{
+	"src": [
+		"src/**/*.md"
+	],
+	"dist": "docs",
+	"outputTypes": ["latex"],
+	"templates": {
+		"docx": {
+			"opts": {
+				"standalone": true,
+				"reference-doc": "templates/default.docx"
+			},
+			"variables": {
+				"pointsize": "14p",
+				"lineheight": "12p",
+				"fontfamily": "T",
+				"indent": "5m"
+			}
+		},
+		"latex": {
+			"opts": {
+				"standalone": true,
+				"template": "templates/default.latex",
+				"include-in-header": "templates/header.latex",
+				"pdf-engine": "xelatex",
+				"webtex": "",
+				"default-image-extension": "svg"
+			},
+			"variables": {
+				"documentclass": "report",
+				"papersize": "a4",
+				"mainfont": "NanumMyeongjo",
+				"geometry": "left=3cm,right=3cm,top=2cm,bottom=2cm",
+				"linestretch": "1.25"
+			}
+		}
+	}
+}
