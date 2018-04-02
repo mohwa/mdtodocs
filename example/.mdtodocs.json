@@ -3,11 +3,10 @@
 		"src/**/*.md"
 	],
 	"dist": "docs",
-	"outputTypes": ["latex"],
+	"outputTypes": ["docx", "latex"],
 	"templates": {
 		"docx": {
 			"opts": {
-				"standalone": true,
 				"reference-doc": "templates/default.docx"
 			},
 			"variables": {
@@ -19,7 +18,6 @@
 		},
 		"latex": {
 			"opts": {
-				"standalone": true,
 				"template": "templates/default.latex",
 				"include-in-header": "templates/header.latex",
 				"pdf-engine": "xelatex",
