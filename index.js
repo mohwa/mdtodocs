@@ -142,7 +142,7 @@ function _getOptions(type = 'docx'){
     const config = this.config;
     const root = this.root;
 
-    let opts = config.templates[type].opts;
+    let opts = config.templates[type].options;
 
     opts = _.assign({}, defaultOpts, opts);
 

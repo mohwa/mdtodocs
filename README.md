@@ -27,41 +27,41 @@ npm i -g mdtodocs
 
 ## .mdtodocs.json
 
-파일은 반드시 `cli`실행 경로에 위치해야하며, 변환 시 사용될 `root`경로도 `cli` 실행 위치와 같습니다.
-
 파일은 기본 설정 및 `pandoc`이 제공하는 [options](https://pandoc.org/MANUAL.html#options) 과 [variables](https://pandoc.org/MANUAL.html#templates) 를 설정할 수 있습니다.
+
+파일은 반드시 `cli`실행 경로에 위치해야하며, 변환 시 사용될 `root`경로도 `cli` 실행 위치와 같습니다.
 
 > 아래 설정은 `example 프로젝트`를 기준으로 작성된 파일입니다.
 
 ```
 {
-	"src": [
-		"src/**/*.md"
-	],
-	"dist": "docs",
-	"outputTypes": ["docx", "latex"],
-	"templates": {
-		"docx": {
-			"opts": {
-				"reference-doc": "templates/default.docx"
-			},
-			"variables": {
-				"pointsize": "14p",
-				...
-			}
-		},
-		"latex": {
-			"opts": {
-				"template": "templates/default.latex",
-				"include-in-header": "templates/header.latex",
-				...
-			},
-			"variables": {
-				"documentclass": "report",
-				...
-			}
-		}
+  "src": [
+    "src/**/*.md"
+  ],
+  "dist": "docs",
+  "outputTypes": ["docx", "latex"],
+  "templates": {
+    "docx": {
+	  "options": {
+	    "reference-doc": "templates/default.docx"
+	  },
+	  "variables": {
+	    "pointsize": "14p",
+	    ...
+	  }
+	},
+	"latex": {
+	  "options": {
+	    "template": "templates/default.latex",
+	    "include-in-header": "templates/header.latex",
+	    ...
+	    },
+	  "variables": {
+	    "documentclass": "report",
+	    ...
+	  }
 	}
+  }
 }
 ```
 
@@ -71,7 +71,7 @@ npm i -g mdtodocs
 |`dist`|출력 파일 위치를 지정합니다.
 |`outputTypes`|출력 타입을 지정합니다.(현재 `docx`, `latex(pdf)`만 제공합니다)
 |`templates`|템플릿을 설정합니다.
-|`opts`| [pandoc options](https://pandoc.org/MANUAL.html#options) 을 설정합니다.
+|`options`| [pandoc options](https://pandoc.org/MANUAL.html#options) 을 설정합니다.
 |`variables`|[pandoc variables](https://pandoc.org/MANUAL.html#templates) 을 설정합니다.
 
 ## CLI 사용 방법
