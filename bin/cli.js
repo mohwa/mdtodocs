@@ -16,7 +16,13 @@ const cliParser = new ArgumentParser({
     description: 'mdtodocs cli example'
 });
 
+cliParser.addArgument(['--verbose'], {
+    help: 'Display the progress message.'
+});
+
 const args = cliParser.parseArgs();
 
-//// publish 시작
-new (require('../index.js'))().convert();
+const verbose = args.verbose === 'true' ? true : false;
+
+// publish 시작
+new (require('../index.js'))({verbose: verbose}).convert();

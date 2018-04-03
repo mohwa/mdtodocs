@@ -81,7 +81,18 @@ npm i -g mdtodocs
 
 ## CLI 사용 방법
 
-> 아래 명령을 통해, 문서를 변환합니다.
+```
+usage: mdtodocs [-h] [-v] [--verbose VERBOSE]
+
+mdtodocs cli example
+
+Optional arguments:
+  -h, --help         Show this help message and exit.
+  -v, --version      Show program's version number and exit.
+  --verbose VERBOSE  Display the progress message.
+```
+
+> 문서를 변환합니다.
 
 ```
 mdtodocs

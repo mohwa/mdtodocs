@@ -8,14 +8,19 @@ const chalk = require('chalk');
 const fse = require('fs-extra');
 const glob = require('glob');
 const log = require('./lib/log');
+const cliSpinners = require('cli-spinners');
+const ora = require('ora');
 
-const { execSync, spawnSync } = require('child_process');
+
+const { execSync, spawnSync, spawn } = require('child_process');
 
 const CONFIG_FILE_NAME = '.mdtodocs.json';
 
 const REFERENCE_DOC = path.join(__dirname, 'templates/default.docx');
 const TEMPLATE_LATEX = path.join(__dirname, 'templates/default.latex');
 const HEADER_LATEX = path.join(__dirname, 'templates/header.latex');
+
+const SPINNERS = {};
 
 // 파일 또는 디렉토리 경로값을 가진 속성
 const ATTR_WITH_FILE_OR_DIR = {
@@ -41,9 +46,12 @@ const ATTR_WITH_FILE_OR_DIR = {
  */
 class MdToDocs{
 
-    constructor(){
+    constructor({
+        verbose = false
+    } = {}){
 
         this.root = process.env.PWD;
+        this.verbose = verbose;
 
         this.init();
     }
@@ -78,10 +86,10 @@ class MdToDocs{
         const outputTypes = this.outputTypes;
 
         const defaultOpts = this.defaultOpts = {
-            from: "markdown",
+            from: 'markdown',
             toc: true,
-            "toc-depth": "2",
-            "highlight-style": "tango"
+            "toc-depth": '2',
+            "highlight-style": 'tango'
         };
 
         const to = {
@@ -92,10 +100,6 @@ class MdToDocs{
         _.forEach(src, v => {
 
             const files = glob.sync(path.join(root, v));
-
-            // entry list 출력해주기
-            log.log('Entry files...', 'green');
-            log.log(files.join('\n'), 'whiteBright');
 
             _.forEach(files, file => {
 
@@ -115,7 +119,7 @@ class MdToDocs{
                     defaultOpts.output = path.join(dist, convertFileName);
                     defaultOpts.to = to[type];
 
-                    _exec.call(this, type, file);
+                    _exec.call(this, type, file, convertFileName);
                 });
             });
         });
@@ -128,18 +132,23 @@ class MdToDocs{
  * @param file - md file path
  * @private
  */
-function _exec(type = 'docx', file = ''){
+function _exec(type = 'docx', file = '', convertFileName = ''){
 
     const opts = _getOptions.call(this, type);
     const variables = _setVariables.call(this, type);
 
     const command = `pandoc ${opts} ${variables} ${file}`;
 
-    log.log('\nRun command...', 'green');
-    log.log(`${command}`, 'yellow');
+    const exec = spawn('pandoc', [opts, variables, file], {stdio: 'inherit', shell: true});
 
-    spawnSync('pandoc', [opts, variables, file], {stdio: 'inherit', shell: true});
+    const spinner = ora(`converting ${convertFileName} file`).start();
 
+    exec.on('exit', (code) => {
+
+        spinner.succeed(`${convertFileName} file convert successed.`);
+
+        if (this.verbose) log.log(`command: ${command}`, 'yellow');
+    });
 }
 
 /**
