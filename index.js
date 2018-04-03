@@ -20,8 +20,6 @@ const REFERENCE_DOC = path.join(__dirname, 'templates/default.docx');
 const TEMPLATE_LATEX = path.join(__dirname, 'templates/default.latex');
 const HEADER_LATEX = path.join(__dirname, 'templates/header.latex');
 
-const SPINNERS = {};
-
 // 파일 또는 디렉토리 경로값을 가진 속성
 const ATTR_WITH_FILE_OR_DIR = {
     "log": true,
@@ -55,6 +53,10 @@ class MdToDocs{
 
         this.init();
     }
+
+    /**
+     * 초기화 함수
+     */
     init(){
 
         const root = this.root;
@@ -78,6 +80,10 @@ class MdToDocs{
 
         if (!fse.pathExistsSync(dist)) fse.mkdirsSync(dist);
     }
+
+    /**
+     * 파일 변환 함수
+     */
     convert(){
 
         const root = this.root;
@@ -127,9 +133,11 @@ class MdToDocs{
 }
 
 /**
+ * 파일 변환 함수
  *
  * @param type
- * @param file - md file path
+ * @param file
+ * @param convertFileName
  * @private
  */
 function _exec(type = 'docx', file = '', convertFileName = ''){
@@ -143,7 +151,7 @@ function _exec(type = 'docx', file = '', convertFileName = ''){
 
     const spinner = ora(`converting ${convertFileName} file`).start();
 
-    exec.on('exit', (code) => {
+    exec.on('exit', () => {
 
         spinner.succeed(`${convertFileName} file convert successed.`);
 
@@ -152,6 +160,7 @@ function _exec(type = 'docx', file = '', convertFileName = ''){
 }
 
 /**
+ * pandoc 옵션을 반환한다.
  *
  * @param type
  * @private
@@ -186,6 +195,7 @@ function _getOptions(type = 'docx'){
 }
 
 /**
+ * pandoc 변수를 반환한다.
  *
  * @returns {string}
  * @private
@@ -212,6 +222,7 @@ function _setVariables(type = 'docx'){
 }
 
 /**
+ * 변환될 파일명를 반환한다.
  *
  * @param type
  * @param fileName
