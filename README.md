@@ -25,6 +25,8 @@ brew cask install mactex 
 
 [miktex](https://miktex.org/download) 설치
 
+> 문서 변환 시, `tex` 관련 패키지들을 설치하라는 메시지가 나올경우, 해당 패키지를 모두 설치하면된다.
+
 ### (나눔)글꼴 설치
 
 http://hangeul.naver.com/font
