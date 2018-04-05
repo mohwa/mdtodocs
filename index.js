@@ -47,7 +47,7 @@ class MdToDocs{
         verbose = false
     } = {}){
 
-        this.root = process.env.PWD;
+        this.root = process.cwd();
         this.verbose = verbose;
 
         this.init();
