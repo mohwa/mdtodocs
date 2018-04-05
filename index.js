@@ -8,7 +8,6 @@ const chalk = require('chalk');
 const fse = require('fs-extra');
 const glob = require('glob');
 const log = require('./lib/log');
-const cliSpinners = require('cli-spinners');
 const ora = require('ora');
 
 

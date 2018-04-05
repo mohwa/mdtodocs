@@ -1,6 +1,6 @@
 {
   "name": "mdtodocs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "mdtodocs",
   "keywords": [
     "pandoc",
@@ -19,7 +19,6 @@
     "chalk": "^2.3.2",
     "fs-extra": "^5.0.0",
     "glob": "^7.0.3",
-    "cli-spinners": "^1.3.0",
     "ora": "^2.0.0"
   },
   "bin": {
