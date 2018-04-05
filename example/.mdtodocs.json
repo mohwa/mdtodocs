@@ -13,9 +13,7 @@
 		},
 		"latex": {
 			"options": {
-				"pdf-engine": "xelatex",
-				"webtex": "",
-				"default-image-extension": "svg"
+				"pdf-engine": "xelatex"
 			},
 			"variables": {
 				"documentclass": "report",

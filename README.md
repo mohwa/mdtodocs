@@ -5,23 +5,32 @@
 
 ## 설치하기
 
+### For Mac
+
 [pandoc](http://pandoc.org/installing.html) 설치
 
 ```
 brew install pandoc
 ```
 
-[mactex](https://tex.stackexchange.com/questions/97183/what-are-the-practical-differences-between-installing-latex-from-mactex-or-macpo) 설치
+[miktex](https://tex.stackexchange.com/questions/97183/what-are-the-practical-differences-between-installing-latex-from-mactex-or-macpo) 설치
 
 ```
 brew cask install mactex 
 ```
 
-(나눔)글꼴 설치
+### For Windows
+
+[pandoc](https://github.com/jgm/pandoc/releases/tag/2.1.3) 설치
+
+[miktex](https://miktex.org/download) 설치
+
+### (나눔)글꼴 설치
 
 http://hangeul.naver.com/font
 
-`mdtodocs` 설치
+### `mdtodocs` 설치
+
 ```
 npm i -g mdtodocs
 ```
